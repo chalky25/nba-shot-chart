@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NBA Shot Chart Visualizer</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .search-container {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-container {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        input {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+
+        button {
+            padding: 8px 16px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button.active {
+            background-color: #004085;
+        }
+
+        .shot-chart {
+            max-width: 600px;
+            height: auto;
+            margin: 20px auto;
+            border-radius: 8px;
+        }
+
+        #loading {
+            display: none;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>NBA Shot Chart Visualizer</h1>
+        
+        <div class="search-container">
+            <input type="text" id="playerName" placeholder="Enter player name">
+            <input type="text" id="seasonId" placeholder="YYYY-YY">
+            <button onclick="generateShotChart()">Generate Shot Chart</button>
+        </div>
+
+        <div class="filter-container">
+            <button onclick="setFilter('both')" class="active" id="bothBtn">Show All Shots</button>
+            <button onclick="setFilter('made')" id="madeBtn">Show Makes Only</button>
+            <button onclick="setFilter('missed')" id="missedBtn">Show Misses Only</button>
+        </div>
+
+        <div id="loading">Generating shot chart...</div>
+        
+        <img id="shotChart" class="shot-chart" src="shot_chart.png" alt="NBA Shot Chart">
+    </div>
+
+    <script>
+        let currentFilter = 'both';
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Update button styles
+            document.getElementById('bothBtn').classList.remove('active');
+            document.getElementById('madeBtn').classList.remove('active');
+            document.getElementById('missedBtn').classList.remove('active');
+            document.getElementById(`${filter}Btn`).classList.add('active');
+            
+            // Regenerate the shot chart with the current filter
+            generateShotChart();
+        }
+
+        async function generateShotChart() {
+            const playerName = document.getElementById('playerName').value || "Kyrie Irving";
+            const seasonId = document.getElementById('seasonId').value || "2024-25";
+            const loading = document.getElementById('loading');
+            const shotChart = document.getElementById('shotChart');
+
+            loading.style.display = 'block';
+            shotChart.style.display = 'none';
+
+            try {
+                const response = await fetch('/generate-shot-chart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        playerName, 
+                        seasonId,
+                        filter: currentFilter 
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate shot chart');
+                }
+
+                // Reload the image with a cache-busting parameter
+                shotChart.src = `shot_chart.png?t=${new Date().getTime()}`;
+                shotChart.style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error generating shot chart. Please try again.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Show the image when it's loaded
+        document.getElementById('shotChart').onload = function() {
+            this.style.display = 'block';
+        };
+    </script>
+</body>
+</html> 
