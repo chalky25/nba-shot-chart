@@ -1,4 +1,4 @@
-import mplcursors
+import os
 import matplotlib
 matplotlib.use('Agg')
 
@@ -29,7 +29,14 @@ def get_player_shotchart_details(player_name, season_id):
 def get_player_shotchart(shotchart_data, player_fg_pct, player_name, season_id):
     plt.figure(figsize=(8, 7))
     shot_chart(shotchart_data, player_fg_pct, title=f"{player_name} Shot Chart {season_id}")
-    plt.savefig('shot_chart.png', bbox_inches='tight', dpi=300)
+    
+    # Create the output directory if it doesn't exist
+    output_dir = 'static'
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Save the file in the nba-shot-chart directory
+    output_path = os.path.join(output_dir, 'shot_chart.png')
+    plt.savefig(output_path, bbox_inches='tight', dpi=300)
     plt.close()
 
 if __name__ == "__main__":

@@ -83,7 +83,7 @@
 
         <div id="loading">Generating shot chart...</div>
         
-        <img id="shotChart" class="shot-chart" src="shot_chart.png" alt="NBA Shot Chart">
+        <img id="shotChart" class="shot-chart" src="/static/shot_chart.png" alt="NBA Shot Chart">
     </div>
 
     <script>
@@ -129,7 +129,7 @@
                 }
 
                 // Reload the image with a cache-busting parameter
-                shotChart.src = `shot_chart.png?t=${new Date().getTime()}`;
+                shotChart.src = `/static/shot_chart.png?t=${new Date().getTime()}`;
                 shotChart.style.display = 'block';
             } catch (error) {
                 console.error('Error:', error);
